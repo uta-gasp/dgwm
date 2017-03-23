@@ -6,11 +6,12 @@ const assert = require('chai').assert;
 
 const DGWM = require('../src/dgwm.js');
 
-function Target (x, y, w = 100, h = 35) {
+function Target (x, y, w = 100, h = 35, text = '') {
 	this.left = x;
 	this.top = y;
 	this.right = x + w;
 	this.bottom = y + h;
+	this.textContent = text;
 }
 
 Target.prototype.getBoundingClientRect = function () {
@@ -95,75 +96,60 @@ DGWM.init({
 		isTextFixed: true
 	},
 	line: {
+		useModel: false,
 		modelMaxGradient: 0.15,
 	    modelTypeSwitchThreshold: 8,
 	    modelRemoveOldFixThreshold: 10
 	},
 	dgwm: {
-
+        saccadeYThresholdInLines: 1.2,
+        saccadeYThresholdInSpacings: 1.75,
+        fixationYThresholdInSpacings: 0.5,
+        fixationXDistFromLineThresholdInPixels: 200,
+        fixationYOffsetDiffThresholdInLines: 1.0
 	}
 });
 
-describe( 'DGWM', function() {
-	describe( '#reset( targets )', function () {
-		DGWM.reset( targets );
-    	it( `should be OK`, function () {
-			assert.isOk( 'just ok' );
-		});
-	});
-	describe( '#feedFixation( fix )', function () {
-		// var line = null;
-		// var results = input.map( (item) => {
-		// 	console.log( '\n ===== NEW FIX =====\n' );
-		// 	line = LinePredictor.get( item.isReading, item.fix, line, 0 );
-		// 	if (line) {
-		// 		line.addFixation( item.fix );
-		// 	}
-		// 	return line;
-		// });
-
-		fixes.forEach( (fix) => {
-			DGWM.feedFixation( fix );
-		});
-    	it( `should be OK`, function () {
-			assert.isOk( 'just ok' );
-		});
-	});
-});
+// describe.skip( 'DGWM', function() {
+// 	describe( '#setWords( targets )', function () {
+// 		DGWM.setWords( targets );
+//     	it( `should be OK`, function () {
+// 			assert.isOk( 'just ok' );
+// 		});
+// 	});
+// 	describe( '#feedFixation( fix )', function () {
+// 		fixes.forEach( (fix) => {
+// 			DGWM.feedFixation( fix );
+// 		});
+//     	it( `should be OK`, function () {
+// 			assert.isOk( 'just ok' );
+// 		});
+// 	});
+// });
 
 describe( 'Real text', function() {
 	const file = fs.readFileSync( getDataFile() );
 	const data = JSON.parse( file );
 
 	const targets = data.words.map( word => {
-		return new Target( word.x, word.y, word.width, word.height );
+		return new Target( word.x, word.y, word.width, word.height, word.text );
 	});
 
 	let prevFix = null;
-	data.fixations.forEach( fix => {
-		if (prevFix) {
-			fix.saccade = {
-				x: fix.x - prevFix.x,
-				y: fix.y - prevFix.y
-			};
-		}
-		else {
-			fix.saccade = {
-				x: 0,
-				y: 0
-			};
-		}
-		prevFix = fix;
+	const fixations = data.fixations.map( fix => {
+		const f = new Fix( fix.x, fix.y, prevFix );
+		prevFix = f;
+		return f;
 	});
 
 	describe( 'mapping', function () {
-		DGWM.reset( targets );
-		data.fixations.forEach( fix => {
+		DGWM.setWords( targets );
+		fixations.forEach( fix => {
 			DGWM.feedFixation( fix );
 		});
 
 		const lineIndexes = new Set();
-		data.fixations.forEach( fix => {
+		fixations.forEach( fix => {
 			lineIndexes.add( fix.line );
 		});
 
@@ -172,7 +158,7 @@ describe( 'Real text', function() {
 		});
 
 		const fixOnLine = [];
-		data.fixations.forEach( fix => {
+		fixations.forEach( fix => {
 			if (fix.line !== undefined) {
 				fixOnLine[ fix.line ] = (fixOnLine[ fix.line ] || 0) + 1;
 			}

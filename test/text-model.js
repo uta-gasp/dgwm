@@ -10,11 +10,12 @@ TextModel.init({
 	isTextFixed: true
 });
 
-function Target (x, y, w = 100, h = 35) {
+function Target (x, y, w = 100, h = 35, text = '') {
 	this.left = x;
 	this.top = y;
 	this.right = x + w;
 	this.bottom = y + h;
+	this.textContent = text;
 }
 
 Target.prototype.getBoundingClientRect = function () {
@@ -69,7 +70,7 @@ describe( 'Real text', function() {
 	const words = JSON.parse( data ).words;
 
 	const targets = words.map( word => {
-		return new Target( word.x, word.y, word.width, word.height );
+		return new Target( word.x, word.y, word.width, word.height, wird.text );
 	});
 
 	describe( '#addWord( word )', function () {

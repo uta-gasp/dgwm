@@ -7,7 +7,7 @@ const regression = require('../libs/regression');
 const Logger = require('./utils/logger');
 
 // Line object
-function Line (word, wordID, dom, index, prevLine) {
+function Line (word, wordID, element, index, prevLine) {
     this.left = Number.MAX_VALUE;
     this.top = Number.MAX_VALUE;
     this.right = Number.MIN_VALUE;
@@ -27,25 +27,26 @@ function Line (word, wordID, dom, index, prevLine) {
     this.words = [];
 
     if (word) {
-        this.add( word, wordID, dom );
+        this.addWord( word, wordID, element );
     }
 }
 
-Line.init = function (settings) {
+Line.init = function (options) {
     _logger = Logger.forModule( 'Line' );
 
-    settings = settings || {};
+    options = options || {};
 
-    _modelMaxGradient = settings.modelMaxGradient || 0.15;
-    _modelTypeSwitchThreshold = settings.modelTypeSwitchThreshold || 8;
-    _modelRemoveOldFixThreshold = settings.modelRemoveOldFixThreshold || 10;
+    _useModel = options.useModel || false;
+    _modelMaxGradient = options.modelMaxGradient || 0.15;
+    _modelTypeSwitchThreshold = options.modelTypeSwitchThreshold || 8;
+    _modelRemoveOldFixThreshold = options.modelRemoveOldFixThreshold || 10;
 };
 
 Line.prototype.width = function () {
     return this.right - this.left;
 };
 
-Line.prototype.add = function (word, wordID, dom) {
+Line.prototype.addWord = function (word, wordID, element) {
     this.left = Math.min( this.left, word.left );
     this.right = Math.max( this.right, word.right );
     this.top = Math.min( this.top, word.top );
@@ -56,30 +57,32 @@ Line.prototype.add = function (word, wordID, dom) {
         y: (this.top + this.bottom) / 2
     };
 
-    this.words.push( new Word( word, wordID, dom, this ) );
+    this.words.push( new Word( word, wordID, element, this ) );
 };
 
 Line.prototype.addFixation = function (fixation) {
 
     this.fixations.push( [fixation.x, fixation.y, fixation.saccade] );
-    _log = _logger.start();
+    if (!_useModel || this.fixations.length < 2) {
+        return;
+    }
 
-    if (this.fixations.length > 1) {
-        this._removeOldFixation();
-        const type = this.fixations.length < _modelTypeSwitchThreshold ? 'linear' : 'polynomial';
-        const model = regression.model( type, this.fixations, 2 );
-        this.fitEq = model.equation;
-        _log.push( 'model for line', this.index, ':', this.fitEq );
+    _log = _logger.start( 'addFixation' );
 
-        if (type === 'linear') {    // put restriction on the gradient
-            if (this.fitEq[1] < -_modelMaxGradient) {
-                this.fitEq = fixLinearModel( this.fixations, -_modelMaxGradient );
-                _log.push( 'model reset to', this.fitEq );
-            }
-            else if (this.fitEq[1] > _modelMaxGradient) {
-                this.fitEq = fixLinearModel( this.fixations, _modelMaxGradient );
-                _log.push( 'model reset to', this.fitEq );
-            }
+    this._removeOldFixation();
+    const type = this.fixations.length < _modelTypeSwitchThreshold ? 'linear' : 'polynomial';
+    const model = regression.model( type, this.fixations, 2 );
+    this.fitEq = model.equation;
+    _log.push( 'model for line', this.index, ':', this.fitEq.map( x => x.toFixed(3) ) );
+
+    if (type === 'linear') {    // put restriction on the gradient
+        if (this.fitEq[1] < -_modelMaxGradient) {
+            this.fitEq = fixLinearModel( this.fixations, -_modelMaxGradient );
+            _log.push( 'model reset to', this.fitEq[0].toFixed(0), ',', this.fitEq[1].toFixed(3) );
+        }
+        else if (this.fitEq[1] > _modelMaxGradient) {
+            this.fitEq = fixLinearModel( this.fixations, _modelMaxGradient );
+            _log.push( 'model reset to', this.fitEq[0].toFixed(0), ',', this.fitEq[1].toFixed(3) );
         }
     }
 
@@ -91,7 +94,7 @@ Line.prototype.fit = function (x, y) {
     if (this.fitEq) {
         const result = y - regression.fit( this.fitEq, x );
         //_logger.log( 'fitting', x, 'to line', this.index, ': error is ', result );
-        const log = _logger.start();
+        const log = _logger.start( 'fit' );
         log.push( 'e[', this.index, '|', x, y, '] =', Math.floor( result ) );
         _logger.end( log );
 
@@ -122,6 +125,7 @@ Line.prototype._removeOldFixation = function () {
 };
 
 // internal
+let _useModel;
 let _modelMaxGradient;
 let _modelTypeSwitchThreshold;
 let _modelRemoveOldFixThreshold;
@@ -139,10 +143,10 @@ function fixLinearModel (fixations, gradient) {
 }
 
 // Word object
-function Word (rect, id, dom, line) {
+function Word (rect, id, element, line) {
     this.rect = rect;
     this.id = id;
-    this.dom = dom;
+    this.element = element;
     this.line = line;
     this.index = line.words.length;
 }

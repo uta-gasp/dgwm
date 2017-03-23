@@ -5,6 +5,7 @@ const assert = require('chai').assert;
 const Line = require('../src/line.js').Line;
 
 Line.init({
+	useModel: false,
 	modelMaxGradient: 0.15,
     modelTypeSwitchThreshold: 8,
     modelRemoveOldFixThreshold: 10
@@ -49,7 +50,7 @@ const pts = [
 describe( 'Line 1', function() {
 	const line = new Line();
 	words.forEach( (word) => {
-		line.add( word );
+		line.addWord( word );
 	});
 	fixations.forEach( (fix) => {
 		line.addFixation( fix );
@@ -86,7 +87,7 @@ describe( 'Line 1', function() {
 describe( 'Line 2', function() {
 	const line = new Line( words[0] );
 	words.forEach( (word, index) => {
-		if (index) { line.add( word ); }
+		if (index) { line.addWord( word ); }
 	});
 	fixations.forEach( (fix) => {
 		line.addFixation( fix );

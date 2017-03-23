@@ -13,14 +13,18 @@ const TextModel = {
         _logger = Logger.forModule( 'TextModel' );
     },
 
-    create: function (targets) {
+    create: function (elements) {
         if (_isTextFixed && _lines.length > 0) {
             return null;
         }
 
-        this.reset();
+        _log = _logger.start( 'create' );
 
-        compute( targets );
+        this.reset();
+        compute( elements );
+
+        _log.push( _lines.length + ' lines' );
+        _logger.end( _log );
 
         return this.model();
     },
@@ -57,16 +61,17 @@ let _lineSpacing;
 let _lineHeight;
 let _lineWidth;
 
+let _log;
 let _logger;
 
-function compute (targets) {
+function compute (elements) {
 
     let lineY = 0;
     let currentLine = null;
 
-    for (let i = 0; i < targets.length; i += 1) {
-        const target = targets[i];
-        const rect = target.getBoundingClientRect();
+    for (let i = 0; i < elements.length; i += 1) {
+        const element = elements[i];
+        const rect = element.getBoundingClientRect();
         if (lineY < rect.top || !currentLine) {
             if (currentLine) {
                 _lineSpacing += rect.top - currentLine.top;
@@ -75,12 +80,12 @@ function compute (targets) {
                     _lineWidth = currentLine.right - currentLine.left;
                 }
             }
-            currentLine = new Line( rect, i, target, _lines.length, _lines[ _lines.length - 1 ] );
+            currentLine = new Line( rect, i, element, _lines.length, _lines[ _lines.length - 1 ] );
             _lines.push( currentLine );
             lineY = rect.top;
         }
         else {
-            currentLine.add( rect, i, target );
+            currentLine.addWord( rect, i, element );
         }
 //                _logger.log('{ left: ' + Math.round(rect.left) + ', top: ' + Math.round(rect.top) + ', right: ' + Math.round(rect.right) + ', bottom: ' + Math.round(rect.bottom) + ' }');
     }
@@ -100,9 +105,6 @@ function compute (targets) {
         const line = _lines[0];
         _lineSpacing = 2 * (line.bottom - line.top);
     }
-
-    const log = _logger.start( _lines.length + ' lines' );
-    _logger.end( log );
 }
 
 // Publication

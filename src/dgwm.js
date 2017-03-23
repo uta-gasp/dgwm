@@ -11,29 +11,35 @@ const DGWM = {
     // Initializes the model
     // Arguments:
     //      settings
-    init: function (settings) {
-        settings = settings || {};
-        _settings = settings.dgwm || {};
+    init: function (options) {
+        options = options || {};
+        options.dgwm = options.dgwm || {};
 
-        Line.init( settings.line );
+        _saccadeYThresholdInLines = options.dgwm.saccadeYThresholdInLines || 1.2;
+        _saccadeYThresholdInSpacings = options.dgwm.saccadeYThresholdInSpacings || 1.75;
+        _fixationYThresholdInSpacings = options.dgwm.fixationYThresholdInSpacings || 0.5;
+        _fixationXDistFromLineThresholdInPixels = options.dgwm.fixationXDistFromLineThresholdInPixels || 200;
+        _fixationYOffsetDiffThresholdInLines = options.dgwm.fixationYOffsetDiffThresholdInLines || 1.0;
 
-        TextModel.init( settings.textModel );
+        Line.init( options.line );
+
+        TextModel.init( options.textModel );
 
         _fixationDetector = Fixations.Detector;
-        _fixationDetector.init( settings.fixationDetector );
+        _fixationDetector.init( options.fixationDetector );
 
         _logger = Logger.forModule( 'DGWM' );
     },
 
     feedFixation: function (fixation) {
         if (!fixation) {
-            return;
+            return null;
         }
 
         _lastFixation = fixation;
 
-        _log = _logger.start( '--- fix ---' );
-        _log.push( fixation.toString() );
+        _log = _logger.start( 'feedFixation' );
+        _log.push( 'fix', fixation.toString() );
 
         _currentLine = lineFromSaccade( fixation.saccade.y ); // line, null, or false
 
@@ -43,6 +49,14 @@ const DGWM = {
         else {  // check how far the fixation from the currentlt mapped line
             _currentLine = ensureFixationIsClose( fixation );
         }
+
+        if (!_currentLine) {
+            _logger.end( _log );
+            return null;
+        }
+
+        _currentLine.addFixation( fixation );
+        fixation.line = _currentLine.index;
 
         _lastMapped = mapToWord( fixation );
 
@@ -67,6 +81,13 @@ const DGWM = {
         return result;
     },
 
+    setWords: function (targets) {
+        if (targets) {
+            this.reset();
+            _textModel = TextModel.create( targets );
+        }
+    },
+
     reset: function (targets) {
         TextModel.reset();
         _fixationDetector.reset();
@@ -75,10 +96,6 @@ const DGWM = {
         _lastMapped = null;
         _lastFixation = null;
         _textModel = null;
-
-        if (targets) {
-            _textModel = TextModel.create( targets );
-        }
     },
 
     callbacks: function (callbacks) {
@@ -100,7 +117,11 @@ const DGWM = {
 };
 
 // internal
-let _settings;
+let _saccadeYThresholdInLines;
+let _saccadeYThresholdInSpacings;
+let _fixationYThresholdInSpacings;
+let _fixationXDistFromLineThresholdInPixels;
+let _fixationYOffsetDiffThresholdInLines;
 
 let _fixationDetector;
 let _logger;
@@ -116,10 +137,10 @@ const _callbacks = {
 };
 
 function lineFromSaccade (dy) {
-    var saccadeThreshold = _textModel.lineHeight * 1.2;
-    var nextLineSaccadeThreshold = _textModel.lineSpacing * 1.75;
+    const saccadeThreshold = _textModel.lineHeight * _saccadeYThresholdInLines;
+    const nextLineSaccadeThreshold = _textModel.lineSpacing * _saccadeYThresholdInSpacings;
 
-    var lineChange = Number.NaN;
+    let lineChange = Number.NaN;
 
     if (Math.abs( dy ) < saccadeThreshold) {
         lineChange = 0;
@@ -133,9 +154,9 @@ function lineFromSaccade (dy) {
 
     _log.push( Number.isNaN( lineChange ) ? 'chaotic jump' : 'line changed by ' + lineChange);
 
-    var result = null;
+    let result = null;
     if (_currentLine && !Number.isNaN( lineChange )) {
-        var newLineIndex = _currentLine.index + lineChange;
+        const newLineIndex = _currentLine.index + lineChange;
         if (newLineIndex >= 0 && newLineIndex < _textModel.lines.length) {
             result = _textModel.lines[ newLineIndex ];
             _log.push( 'line #', result.index );
@@ -145,7 +166,6 @@ function lineFromSaccade (dy) {
         }
     }
     else {
-        result = false;
         _log.push( 'cannot estimate line from saccade' );
     }
 
@@ -154,9 +174,11 @@ function lineFromSaccade (dy) {
 }
 
 function lineFromAbsolutePosition (fixation) {
-    var verticalThreshold = _textModel.lineSpacing * 0.5;
-    var horizontalThreshold = 200;
-    var result = _textModel.lines.find( (line) => {
+    _log.push( 'estimating line naively' );
+    const verticalThreshold = _textModel.lineSpacing * _fixationYThresholdInSpacings;
+    const horizontalThreshold = _fixationXDistFromLineThresholdInPixels;
+
+    const result = _textModel.lines.find( line => {
         let dy = Math.abs( fixation.y - line.center.y );
         let dx = fixation.x < line.left ? line.left - fixation.x :
                 (fixation.x > line.right ? fixation.x - line.right : 0);
@@ -174,57 +196,58 @@ function lineFromAbsolutePosition (fixation) {
 }
 
 function ensureFixationIsClose (fixation) {
-    var fixOffsetY = fixation.y - _currentLine.center.y;
-    _log.push( 'checking the Y offset', fixOffsetY );
+    const fixOffsetY = fixation.y - _currentLine.center.y;
+    const fixationYOffsetDiffThreshold = _textModel.lineHeight * _fixationYOffsetDiffThresholdInLines;
 
-    var doesNotFollow = _textModel.lines.find( line => {
+    _log.push( 'fix-line Y offset:', fixOffsetY.toFixed(0) );
+    _log.push( '    should differ by no more than', _textModel.lineHeight.toFixed(0), 'from other offsets' );
+
+    const doesNotFollow = _textModel.lines.find( line => {
         if (!line.fixations.length) {
             return false;
         }
 
-        var y = line.center.y;
-        _log.push( '    ly =', y );
-        var avgOffsetY = line.fixations.reduce( (sum, fix) => {
-            _log.push( '    :', (fix[1] - y) );
+        const y = line.center.y;
+        _log.push( '    ly =', y.toFixed(0) );
+
+        const avgOffsetY = line.fixations.reduce( (sum, fix) => {
+            // _log.push( '        :', (fix[1] - y).toFixed(0) );
             return sum + (fix[1] - y);
         }, 0) / line.fixations.length;
 
-        _log.push( '    d = ', avgOffsetY );
+        _log.push( '        d =', avgOffsetY.toFixed(0) );
 
         if (avgOffsetY === undefined) {
             return false;
         }
 
-        return fixOffsetY < avgOffsetY - _textModel.lineHeight ||
-               fixOffsetY > avgOffsetY + _textModel.lineHeight;
+        return fixOffsetY < avgOffsetY - fixationYOffsetDiffThreshold ||
+               fixOffsetY > avgOffsetY + fixationYOffsetDiffThreshold;
     });
 
     if (doesNotFollow) {
-        _log.push( 'the line is too far, mapping naively' );
+        _log.push( '--- the line is too far, mapping naively' );
         return lineFromAbsolutePosition( fixation );
     }
 
+    _log.push( '--- OK' );
     return _currentLine;
 }
 
 function mapToWord (fixation) {
-    if (!_currentLine) {
-        return null;
-    }
+    _log.push( 'word search' );
+    const x = fixation.x;
+    let result = null;
+    let minDist = Number.MAX_VALUE;
 
-    _currentLine.addFixation( fixation );
-    fixation.line = _currentLine.index;
+    const words = _currentLine.words;
+    for (let i = 0; i < words.length; ++i) {
+        const word = words[i];
+        const rect = word.rect;
 
-    var x = fixation.x;
-    var result = null;
-    var minDist = Number.MAX_VALUE;
+        const dist = x < rect.left ? (rect.left - x) : (x > rect.right ? x - rect.right : 0);
+        _log.push( '   ', dist.toFixed(0), 'to', word.element.textContent );
 
-    var words = _currentLine.words;
-    for (var i = 0; i < words.length; ++i) {
-        var word = words[i];
-        var rect = word.rect;
-
-        var dist = x < rect.left ? (rect.left - x) : (x > rect.right ? x - rect.right : 0);
         if (dist < minDist) {
             result = word;
             minDist = dist;
@@ -240,7 +263,9 @@ function mapToWord (fixation) {
         _callbacks.onMapped( fixation );
     }
 
-    _log.push( '[d=', Math.floor( minDist ), ']', result ? result.line.index + ',' + result.index : '' );
+    _log.push( '    mapped to',
+        result ? (result.element.textContent + ' ' + result.line.index + ',' + result.index) : '---',
+        '[d=', Math.floor( minDist ), ']' );
 
     return result;
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 const Logger = {
-    enabled: false
+    enabled: true
 };
 
 Logger.moduleErrorPrinter = (moduleName) => {
@@ -82,11 +82,7 @@ function Record (module, title) {
         return;
     }
 
-    console.log( '' + this.generalPadding + module );
-
-    if (title) {
-        console.log( Record.padding + this.generalPadding + title );
-    }
+    console.log( '' + this.generalPadding + module + (title ? ' # ' + title : '') );
 }
 
 Record.padding = '    ';
