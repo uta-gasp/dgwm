@@ -1,0 +1,4 @@
+node_modules/
+*.sublime-*
+*.bat
+npm-debug.log

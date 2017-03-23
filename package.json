@@ -1,0 +1,22 @@
+{
+  "name": "dgwm.js",
+  "version": "1.0.0",
+  "description": "Dynamic gaze-to-word mapper",
+  "main": "dgwm.js",
+  "scripts": {
+    "test": "mocha",
+    "build": "./node_modules/.bin/webpack",
+    "release": "set NODE_ENV=production && call ./node_modules/.bin/webpack"
+  },
+  "author": "lexasss",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.20.0",
+    "babel-loader": "^6.2.9",
+    "babel-preset-latest": "^6.16.0",
+    "chai": "^3.5.0",
+    "jshint": "^2.9.4",
+    "jshint-loader": "^0.8.3",
+    "webpack": "^2.3.0"
+  }
+}
