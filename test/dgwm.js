@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('chai').assert;
 
+const Logger = require('../src/utils/logger.js');
 const DGWM = require('../src/dgwm.js');
 
 function Target (x, y, w = 100, h = 35, text = '') {
@@ -17,29 +18,6 @@ function Target (x, y, w = 100, h = 35, text = '') {
 Target.prototype.getBoundingClientRect = function () {
 	return this;
 }
-
-function getDataFile( name = 'p10_0_2.json' ) {
-	let dataFolder = process.cwd();
-	if (!/test$/.test( dataFolder )) {
-		dataFolder = path.join( dataFolder, 'test' );
-	}
-	return path.join( dataFolder, 'data', name );
-}
-
-const targets = [
-	new Target(0, 0),
-	new Target(110, 0),
-	new Target(220, 0),
-	new Target(330, 0),
-	new Target(440, 0),
-	new Target(550, 0),
-	new Target(0, 100),
-	new Target(110, 100),
-	new Target(220, 100),
-	new Target(330, 100),
-	new Target(440, 100),
-	new Target(550, 100),
-];
 
 function Fix (x, y, prevFix) {
 	this.x = x;
@@ -55,35 +33,6 @@ function Fix (x, y, prevFix) {
 Fix.prototype.toString = function () {
 	return `${this.x}, ${this.y}`;
 };
-
-const fixations = [
-	{x: 30, y: 15},
-	{x: 130, y: 10},
-	{x: 250, y: -5},
-	{x: 370, y: 5},
-	{x: 470, y: -10},
-	{x: 490, y: 5},
-	{x: 590, y: 0},
-	{x: 200, y: 30},
-	{x: 30, y: 120},
-	{x: 130, y: 120},
-	{x: 250, y: 115},
-	{x: 370, y: 100},
-	{x: 470, y: 95},
-	{x: 490, y: 95},
-	{x: 590, y: 90},
-];
-
-const fixes = [];
-for (let i = 0, lf = null; i < fixations.length; i += 1) {
-	let fix = fixations[i];
-	fix = new Fix( fix.x, fix.y, lf );
-	if (lf) {
-		lf.next = fix;
-	}
-	lf = fix;
-	fixes.push( fix );
-}
 
 DGWM.init({
 	fixationDetector: {
@@ -104,9 +53,8 @@ DGWM.init({
 	dgwm: {
         saccadeYThresholdInLines: 1.2,
         saccadeYThresholdInSpacings: 1.75,
-        fixationYThresholdInSpacings: 0.5,
-        fixationXDistFromLineThresholdInPixels: 200,
-        fixationYOffsetDiffThresholdInLines: 1.0
+        fixationXDistFromLineThresholdInPixels: 100,
+        fixationYOffsetDiffThresholdInLines: 0.47
 	}
 });
 
@@ -127,8 +75,18 @@ DGWM.init({
 // 	});
 // });
 
-describe( 'Real text', function() {
-	const file = fs.readFileSync( getDataFile() );
+function getDataFile( name ) {
+	let dataFolder = process.cwd();
+	if (!/test$/.test( dataFolder )) {
+		dataFolder = path.join( dataFolder, 'test' );
+	}
+	return path.join( dataFolder, 'data', name );
+}
+
+function runTestOnFile( filename, expectedFixations, hasFixationsNotMapped = true, firstLineIndex = 0 ) {
+	console.log( filename );
+
+	const file = fs.readFileSync( getDataFile( filename ) );
 	const data = JSON.parse( file );
 
 	const targets = data.words.map( word => {
@@ -142,7 +100,7 @@ describe( 'Real text', function() {
 		return f;
 	});
 
-	describe( 'mapping', function () {
+	describe( `mapping ${filename}`, function () {
 		DGWM.setWords( targets );
 		fixations.forEach( fix => {
 			DGWM.feedFixation( fix );
@@ -153,8 +111,8 @@ describe( 'Real text', function() {
 			lineIndexes.add( fix.line );
 		});
 
-    	it( `should have 4 lines + undefined`, function () {
-			assert.equal( 5, lineIndexes.size );
+    	it( `should have ${expectedFixations.length} lines ${hasFixationsNotMapped ? '+ undefined' : ''}`, function () {
+			assert.equal( expectedFixations.length + (hasFixationsNotMapped ? 1 : 0), lineIndexes.size );
 		});
 
 		const fixOnLine = [];
@@ -164,17 +122,25 @@ describe( 'Real text', function() {
 			}
 		});
 
-    	it( `should have 10 fixations on the lines #1`, function () {
-			assert.equal( 10, fixOnLine[0] );
-		});
-    	it( `should have 8 fixations on the lines #2`, function () {
-			assert.equal( 8, fixOnLine[1] );
-		});
-    	it( `should have 9 fixations on the lines #3`, function () {
-			assert.equal( 9, fixOnLine[2] );
-		});
-    	it( `should have 8 fixations on the lines #4`, function () {
-			assert.equal( 8, fixOnLine[3] );
-		});
+		expectedFixations.forEach( (expectation, index) => {
+	    	it( `should have ${expectation} fixations on the lines #${index+firstLineIndex+1}`, function () {
+				assert.equal( expectation, fixOnLine[ index + firstLineIndex ] );
+			});
+		})
 	});
+}
+
+describe( 'Real text', function() {
+	Logger.enabled = true;
+	// runTestOnFile( 'p10_0_2.json', [10, 8, 9, 8] );
+	// runTestOnFile( 'p10_2_2.json', [6, 12, 10, 10, 15, 9] );
+ // 	runTestOnFile( 'p13_0_4.json', [8, 7, 7, 5] );
+	// runTestOnFile( 'p16_2_2.json', [7, 8, 4, 5, 7, 8] );
+	// runTestOnFile( 'p17_0_2.json', [9, 9, 6, 8] );
+	// runTestOnFile( 'p17_1_3.json', [11, 7, 7, 11, 9] );
+	// runTestOnFile( 'p17_2_1.json', [13, 14, 12, 4, 11, 10] );
+	// runTestOnFile( 'p18_0_2.json', [6, 4, 5], true, 1);
+	// runTestOnFile( 'p1_2_0.json', [5, 5, 10, 7, 7, 9] );
+	// runTestOnFile( 'p20_1_3.json', [8, 7, 10, 10, 6] );
+	runTestOnFile( 'p20_2_0.json', [10, 10, 7, 6, 8, 12] );
 });

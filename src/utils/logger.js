@@ -1,7 +1,7 @@
 'use strict';
 
 const Logger = {
-    enabled: true
+    enabled: false
 };
 
 Logger.moduleErrorPrinter = (moduleName) => {
