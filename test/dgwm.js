@@ -28,11 +28,14 @@ function Fix (x, y, prevFix) {
 	this.saccade.newLine = prevFix ? (x < prevFix.x && y > prevFix.y + 50) : false;
 	this.previous = prevFix;
 	this.next = null;
+	this.id = Fix.counter++;
 }
 
 Fix.prototype.toString = function () {
 	return `${this.x}, ${this.y}`;
 };
+
+Fix.counter = 0;
 
 DGWM.init({
 	fixationDetector: {
@@ -54,7 +57,9 @@ DGWM.init({
         saccadeYThresholdInLines: 1.2,
         saccadeYThresholdInSpacings: 1.75,
         fixationXDistFromLineThresholdInPixels: 100,
-        fixationYOffsetDiffThresholdInLines: 0.47
+        fixationYDistFromLineThresholdInSpaces: 0.7,
+        fixationYOffsetDiffThresholdInLines: 0.49,
+        emptyLineSuperority: 0.3
 	}
 });
 
@@ -84,7 +89,7 @@ function getDataFile( name ) {
 }
 
 function runTestOnFile( filename, expectedFixations, hasFixationsNotMapped = true, firstLineIndex = 0 ) {
-	console.log( filename );
+	// console.log( filename );
 
 	const file = fs.readFileSync( getDataFile( filename ) );
 	const data = JSON.parse( file );
@@ -94,6 +99,7 @@ function runTestOnFile( filename, expectedFixations, hasFixationsNotMapped = tru
 	});
 
 	let prevFix = null;
+	Fix.counter = 0;
 	const fixations = data.fixations.map( fix => {
 		const f = new Fix( fix.x, fix.y, prevFix );
 		prevFix = f;
@@ -130,17 +136,35 @@ function runTestOnFile( filename, expectedFixations, hasFixationsNotMapped = tru
 	});
 }
 
-describe( 'Real text', function() {
+describe( 'Real data', function() {
+	Logger.enabled = false;
+	runTestOnFile( 'p10_0_2.json', [10, 8, 9, 8] );
+	runTestOnFile( 'p10_2_2.json', [6, 12, 11, 8, 15, 10] );
+ 	runTestOnFile( 'p13_0_4.json', [7, 7, 7, 5] );
+	runTestOnFile( 'p16_2_2.json', [7, 7, 5, 5, 7, 8] );
+	runTestOnFile( 'p17_0_2.json', [9, 9, 6, 8] );
+	runTestOnFile( 'p17_1_3.json', [11, 7, 7, 11, 9] );
+	runTestOnFile( 'p17_2_1.json', [13, 13, 13, 4, 11, 10] );
+	runTestOnFile( 'p18_0_2.json', [3, 6, 4, 5]);
+	runTestOnFile( 'p1_2_0.json', [5, 6, 8, 7, 8, 9] );
+	runTestOnFile( 'p20_1_3.json', [8, 7, 10, 10, 6] );
+	runTestOnFile( 'p20_2_0.json', [10, 9, 8, 6, 8, 12] );
+	runTestOnFile( 'p22_1_2.json', [9, 9, 11, 9, 8] );
+	runTestOnFile( 'p23_2_1.json', [9, 10, 7, 4, 9, 8] );
+	runTestOnFile( 'p2_1_3.json', [6, 8, 13, 9, 8] );
+	runTestOnFile( 'p2_2_0.json', [6, 10, 7, 6, 11, 7] );
+	runTestOnFile( 'p3_1_1.json', [12, 16, 24, 9] ); // > ideal = [11, 17, 24, 9]
+	runTestOnFile( 'p4_0_2.json', [8, 6, 4, 12] );
+	runTestOnFile( 'p4_1_2.json', [6, 3, 8, 7, 7] );
+	runTestOnFile( 'p4_2_2.json', [6, 10, 6, 5, 5, 7] );
+	runTestOnFile( 'p5_2_1.json', [8, 6, 7, 5, 13, 11] );
+	runTestOnFile( 'p6_1_1.json', [10, 10, 9, 9, 8] );
+	runTestOnFile( 'p6_2_1.json', [8, 6, 7, 6, 9, 14] );
+	runTestOnFile( 'p7_2_0.json', [3, 11, 7, 7, 7, 16] );
+	runTestOnFile( 'p9_1_1.json', [13, 9, 9, 10, 5] );
+	runTestOnFile( 'p9_2_2.json', [9, 12, 8, 9, 6, 14] );
+});
+
+describe( 'Debugging', function() {
 	Logger.enabled = true;
-	// runTestOnFile( 'p10_0_2.json', [10, 8, 9, 8] );
-	// runTestOnFile( 'p10_2_2.json', [6, 12, 10, 10, 15, 9] );
- // 	runTestOnFile( 'p13_0_4.json', [8, 7, 7, 5] );
-	// runTestOnFile( 'p16_2_2.json', [7, 8, 4, 5, 7, 8] );
-	// runTestOnFile( 'p17_0_2.json', [9, 9, 6, 8] );
-	// runTestOnFile( 'p17_1_3.json', [11, 7, 7, 11, 9] );
-	// runTestOnFile( 'p17_2_1.json', [13, 14, 12, 4, 11, 10] );
-	// runTestOnFile( 'p18_0_2.json', [6, 4, 5], true, 1);
-	// runTestOnFile( 'p1_2_0.json', [5, 5, 10, 7, 7, 9] );
-	// runTestOnFile( 'p20_1_3.json', [8, 7, 10, 10, 6] );
-	runTestOnFile( 'p20_2_0.json', [10, 10, 7, 6, 8, 12] );
 });

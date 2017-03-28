@@ -1,0 +1,655 @@
+{
+  "fixations" : [ {
+    "duration" : 299,
+    "ts" : 3791028,
+    "x" : 592,
+    "y" : 252
+  }, {
+    "duration" : 333,
+    "ts" : 3791361,
+    "x" : 456,
+    "y" : 252
+  }, {
+    "duration" : 1167,
+    "ts" : 3791727,
+    "x" : 626,
+    "y" : 235
+  }, {
+    "duration" : 534,
+    "ts" : 3792927,
+    "x" : 700,
+    "y" : 235
+  }, {
+    "duration" : 900,
+    "ts" : 3793494,
+    "x" : 862,
+    "y" : 223
+  }, {
+    "duration" : 433,
+    "ts" : 3794427,
+    "x" : 928,
+    "y" : 222
+  }, {
+    "duration" : 133,
+    "ts" : 3794927,
+    "x" : 424,
+    "y" : 317
+  }, {
+    "duration" : 566,
+    "ts" : 3795094,
+    "x" : 351,
+    "y" : 307
+  }, {
+    "duration" : 366,
+    "ts" : 3795694,
+    "x" : 459,
+    "y" : 300
+  }, {
+    "duration" : 400,
+    "ts" : 3796094,
+    "x" : 561,
+    "y" : 297
+  }, {
+    "duration" : 333,
+    "ts" : 3796527,
+    "x" : 464,
+    "y" : 292
+  }, {
+    "duration" : 1434,
+    "ts" : 3796893,
+    "x" : 568,
+    "y" : 308
+  }, {
+    "duration" : 666,
+    "ts" : 3798527,
+    "x" : 713,
+    "y" : 298
+  }, {
+    "duration" : 434,
+    "ts" : 3799226,
+    "x" : 832,
+    "y" : 293
+  }, {
+    "duration" : 533,
+    "ts" : 3799693,
+    "x" : 977,
+    "y" : 299
+  }, {
+    "duration" : 166,
+    "ts" : 3800260,
+    "x" : 1035,
+    "y" : 304
+  }, {
+    "duration" : 166,
+    "ts" : 3800460,
+    "x" : 502,
+    "y" : 358
+  }, {
+    "duration" : 1533,
+    "ts" : 3800660,
+    "x" : 470,
+    "y" : 376
+  }, {
+    "duration" : 900,
+    "ts" : 3802359,
+    "x" : 574,
+    "y" : 356
+  }, {
+    "duration" : 300,
+    "ts" : 3803293,
+    "x" : 640,
+    "y" : 375
+  }, {
+    "duration" : 1333,
+    "ts" : 3803626,
+    "x" : 817,
+    "y" : 379
+  }, {
+    "duration" : 334,
+    "ts" : 3804992,
+    "x" : 887,
+    "y" : 382
+  }, {
+    "duration" : 167,
+    "ts" : 3805359,
+    "x" : 958,
+    "y" : 376
+  }, {
+    "duration" : 467,
+    "ts" : 3805592,
+    "x" : 406,
+    "y" : 429
+  }, {
+    "duration" : 1233,
+    "ts" : 3806092,
+    "x" : 449,
+    "y" : 449
+  }, {
+    "duration" : 333,
+    "ts" : 3807659,
+    "x" : 582,
+    "y" : 446
+  }, {
+    "duration" : 967,
+    "ts" : 3808025,
+    "x" : 733,
+    "y" : 442
+  }, {
+    "duration" : 267,
+    "ts" : 3809025,
+    "x" : 819,
+    "y" : 442
+  }, {
+    "duration" : 300,
+    "ts" : 3809325,
+    "x" : 888,
+    "y" : 439
+  }, {
+    "duration" : 234,
+    "ts" : 3809658,
+    "x" : 558,
+    "y" : 476
+  }, {
+    "duration" : 400,
+    "ts" : 3809925,
+    "x" : 370,
+    "y" : 507
+  }, {
+    "duration" : 867,
+    "ts" : 3810358,
+    "x" : 479,
+    "y" : 517
+  }, {
+    "duration" : 300,
+    "ts" : 3811258,
+    "x" : 618,
+    "y" : 510
+  }, {
+    "duration" : 100,
+    "ts" : 3811592,
+    "x" : 0,
+    "y" : -1
+  }, {
+    "duration" : 900,
+    "ts" : 3811725,
+    "x" : 626,
+    "y" : 500
+  }, {
+    "duration" : 467,
+    "ts" : 3812658,
+    "x" : 697,
+    "y" : 504
+  }, {
+    "duration" : 267,
+    "ts" : 3813158,
+    "x" : 788,
+    "y" : 509
+  }, {
+    "duration" : 433,
+    "ts" : 3813458,
+    "x" : 685,
+    "y" : 497
+  }, {
+    "duration" : 733,
+    "ts" : 3813925,
+    "x" : 811,
+    "y" : 514
+  }, {
+    "duration" : 300,
+    "ts" : 3814691,
+    "x" : 889,
+    "y" : 513
+  }, {
+    "duration" : 467,
+    "ts" : 3815024,
+    "x" : 995,
+    "y" : 517
+  }, {
+    "duration" : 1133,
+    "ts" : 3815558,
+    "x" : 432,
+    "y" : 568
+  }, {
+    "duration" : 500,
+    "ts" : 3816724,
+    "x" : 588,
+    "y" : 585
+  }, {
+    "duration" : 434,
+    "ts" : 3817257,
+    "x" : 775,
+    "y" : 581
+  }, {
+    "duration" : 267,
+    "ts" : 3817724,
+    "x" : 834,
+    "y" : 584
+  }, {
+    "duration" : 633,
+    "ts" : 3818024,
+    "x" : 762,
+    "y" : 593
+  }, {
+    "duration" : 466,
+    "ts" : 3818691,
+    "x" : 921,
+    "y" : 597
+  }, {
+    "duration" : 466,
+    "ts" : 3819191,
+    "x" : 1025,
+    "y" : 599
+  }, {
+    "duration" : 166,
+    "ts" : 3819691,
+    "x" : 0,
+    "y" : -1
+  }, {
+    "duration" : 133,
+    "ts" : 3819957,
+    "x" : 0,
+    "y" : -1
+  }, {
+    "duration" : 300,
+    "ts" : 3820257,
+    "x" : -36,
+    "y" : 463
+  }, {
+    "duration" : 100,
+    "ts" : 3820624,
+    "x" : 741,
+    "y" : 769
+  } ],
+  "setup" : {
+    "lineSize" : 0,
+    "textID" : 2
+  },
+  "words" : [ {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "Aurinko",
+    "timestamp" : 0,
+    "width" : 104.61666870117188,
+    "x" : 391.91668701171875,
+    "y" : 195.75
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "on",
+    "timestamp" : 0,
+    "width" : 34.366668701171875,
+    "x" : 503.76666259765625,
+    "y" : 195.75
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "Maata",
+    "timestamp" : 0,
+    "width" : 85.84999084472656,
+    "x" : 545.36669921875,
+    "y" : 195.75
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "lähinnä",
+    "timestamp" : 0,
+    "width" : 98.83334350585938,
+    "x" : 638.4500122070312,
+    "y" : 195.75
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "oleva",
+    "timestamp" : 0,
+    "width" : 71.48333740234375,
+    "x" : 744.5166625976562,
+    "y" : 195.75
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "tähti.",
+    "timestamp" : 0,
+    "width" : 70.75,
+    "x" : 823.2333374023438,
+    "y" : 195.75
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "Se",
+    "timestamp" : 0,
+    "width" : 31.25,
+    "x" : 901.2166748046875,
+    "y" : 195.75
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "on",
+    "timestamp" : 0,
+    "width" : 34.366668701171875,
+    "x" : 939.7000122070312,
+    "y" : 195.75
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "erittäin",
+    "timestamp" : 0,
+    "width" : 96.88334655761719,
+    "x" : 289.2166748046875,
+    "y" : 262.8500061035156
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "kuuma",
+    "timestamp" : 0,
+    "width" : 91.13333129882812,
+    "x" : 393.33331298828125,
+    "y" : 262.8500061035156
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "kaasupallo.",
+    "timestamp" : 0,
+    "width" : 150.9499969482422,
+    "x" : 491.70001220703125,
+    "y" : 262.8500061035156
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "Lämpötila",
+    "timestamp" : 0,
+    "width" : 132.13333129882812,
+    "x" : 649.88330078125,
+    "y" : 262.8500061035156
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "Auringon",
+    "timestamp" : 0,
+    "width" : 122.19999694824219,
+    "x" : 789.25,
+    "y" : 262.8500061035156
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "pinnassa",
+    "timestamp" : 0,
+    "width" : 116.5,
+    "x" : 918.683349609375,
+    "y" : 262.8500061035156
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "on",
+    "timestamp" : 0,
+    "width" : 34.366668701171875,
+    "x" : 1042.4166259765625,
+    "y" : 262.8500061035156
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "noin",
+    "timestamp" : 0,
+    "width" : 59.399993896484375,
+    "x" : 348.316650390625,
+    "y" : 329.95001220703125
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "6",
+    "timestamp" : 0,
+    "width" : 16.2166748046875,
+    "x" : 414.95001220703125,
+    "y" : 329.95001220703125
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "000",
+    "timestamp" : 0,
+    "width" : 48.65000915527344,
+    "x" : 438.3999938964844,
+    "y" : 329.95001220703125
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "°C.",
+    "timestamp" : 0,
+    "width" : 36.433319091796875,
+    "x" : 494.2833251953125,
+    "y" : 329.95001220703125
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "Auringosta",
+    "timestamp" : 0,
+    "width" : 144.01666259765625,
+    "x" : 537.9500122070312,
+    "y" : 329.95001220703125
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "säteilee",
+    "timestamp" : 0,
+    "width" : 103.05000305175781,
+    "x" : 689.2000122070312,
+    "y" : 329.95001220703125
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "valoa",
+    "timestamp" : 0,
+    "width" : 71.33332824707031,
+    "x" : 799.4833374023438,
+    "y" : 329.95001220703125
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "ja",
+    "timestamp" : 0,
+    "width" : 23.966659545898438,
+    "x" : 878.0499877929688,
+    "y" : 329.95001220703125
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "lämpöä.",
+    "timestamp" : 0,
+    "width" : 108.41667175292969,
+    "x" : 909.25,
+    "y" : 329.95001220703125
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "Maa",
+    "timestamp" : 0,
+    "width" : 59.56666564941406,
+    "x" : 370.8999938964844,
+    "y" : 397.04998779296875
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "sijaitsee",
+    "timestamp" : 0,
+    "width" : 108.56666564941406,
+    "x" : 437.70001220703125,
+    "y" : 397.04998779296875
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "sopivalla",
+    "timestamp" : 0,
+    "width" : 117,
+    "x" : 553.5,
+    "y" : 397.04998779296875
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "etäisyydellä",
+    "timestamp" : 0,
+    "width" : 157.5500030517578,
+    "x" : 677.7333374023438,
+    "y" : 397.04998779296875
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "Auringosta.",
+    "timestamp" : 0,
+    "width" : 152.56666564941406,
+    "x" : 842.5166625976562,
+    "y" : 397.04998779296875
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "Aurinko",
+    "timestamp" : 0,
+    "width" : 104.61666870117188,
+    "x" : 306.26666259765625,
+    "y" : 464.1499938964844
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "on",
+    "timestamp" : 0,
+    "width" : 34.366668701171875,
+    "x" : 418.1166687011719,
+    "y" : 464.1499938964844
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "kooltaan",
+    "timestamp" : 0,
+    "width" : 116.26667785644531,
+    "x" : 459.7166748046875,
+    "y" : 464.1499938964844
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "109",
+    "timestamp" : 0,
+    "width" : 48.65000915527344,
+    "x" : 583.2166748046875,
+    "y" : 464.1499938964844
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "kertaa",
+    "timestamp" : 0,
+    "width" : 84.36665344238281,
+    "x" : 639.0999755859375,
+    "y" : 464.1499938964844
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "suurempi",
+    "timestamp" : 0,
+    "width" : 125.30000305175781,
+    "x" : 730.7000122070312,
+    "y" : 464.1499938964844
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "kuin",
+    "timestamp" : 0,
+    "width" : 57.166656494140625,
+    "x" : 863.2333374023438,
+    "y" : 464.1499938964844
+  }, {
+    "duration" : 0,
+    "focusCount" : 0,
+    "height" : 40,
+    "text" : "maapallo.",
+    "timestamp" : 0,
+    "width" : 132.0833282470703,
+    "x" : 927.63330078125,
+    "y" : 464.1499938964844
+  }, {
+    "duration" : 2199.9923247726983,
+    "focusCount" : 3,
+    "height" : 40,
+    "text" : "Aurinko",
+    "timestamp" : 282710.63991760736,
+    "width" : 104.61666870117188,
+    "x" : 266.66668701171875,
+    "y" : 531.25
+  }, {
+    "duration" : 499.91030693770153,
+    "focusCount" : 1,
+    "height" : 40,
+    "text" : "ja",
+    "timestamp" : 272743.5122018263,
+    "width" : 23.9666748046875,
+    "x" : 378.51666259765625,
+    "y" : 531.25
+  }, {
+    "duration" : 6932.953766573133,
+    "focusCount" : 6,
+    "height" : 40,
+    "text" : "kahdeksan",
+    "timestamp" : 277511.4655400147,
+    "width" : 142.0500030517578,
+    "x" : 409.7166748046875,
+    "y" : 531.25
+  }, {
+    "duration" : 4858.03596290198,
+    "focusCount" : 8,
+    "height" : 40,
+    "text" : "planeettaa",
+    "timestamp" : 283876.7180014422,
+    "width" : 142.28334045410156,
+    "x" : 559,
+    "y" : 531.25
+  }, {
+    "duration" : 5933.831062894053,
+    "focusCount" : 6,
+    "height" : 40,
+    "text" : "muodostavat",
+    "timestamp" : 284408.6679196921,
+    "width" : 174.56666564941406,
+    "x" : 708.5166625976562,
+    "y" : 531.25
+  }, {
+    "duration" : 3031.7392957354314,
+    "focusCount" : 5,
+    "height" : 40,
+    "text" : "aurinkokunnan.",
+    "timestamp" : 285842.71540614445,
+    "width" : 209.01666259765625,
+    "x" : 890.316650390625,
+    "y" : 531.25
+  } ]
+}

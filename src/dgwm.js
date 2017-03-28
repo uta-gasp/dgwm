@@ -18,7 +18,9 @@ const DGWM = {
         _saccadeYThresholdInLines = options.dgwm.saccadeYThresholdInLines || 1.2;
         _saccadeYThresholdInSpacings = options.dgwm.saccadeYThresholdInSpacings || 1.75;
         _fixationXDistFromLineThresholdInPixels = options.dgwm.fixationXDistFromLineThresholdInPixels || 200;
+        _fixationYDistFromLineThresholdInSpaces = options.dgwm.fixationYDistFromLineThresholdInSpaces || 0.65;
         _fixationYOffsetDiffThresholdInLines = options.dgwm.fixationYOffsetDiffThresholdInLines || 1.0;
+        _emptyLineSuperority = options.dgwm.emptyLineSuperority || 0.3;
 
         Line.init( options.line );
 
@@ -40,6 +42,13 @@ const DGWM = {
         _log = _logger.start( 'feedFixation' );
         _log.push( 'fix', fixation.toString() );
 
+        if (fixation.x === 0 && fixation.y === -1) {
+            _log.push( '...invalid' );
+            // _currentLine = null;
+            _logger.end( _log );
+            return null;
+        }
+
         _currentLine = lineFromSaccade( fixation.saccade.x, fixation.saccade.y ); // line, null, or false
 
         if (!_currentLine) {
@@ -54,14 +63,22 @@ const DGWM = {
             return null;
         }
 
-        _currentLine.addFixation( fixation );
-        fixation.line = _currentLine.index;
+        _currentWord = mapToWord( fixation );
 
-        _lastMapped = mapToWord( fixation );
+        fixation.word = _currentWord;
+        if (_currentWord && _currentLine) {
+            fixation.line = _currentLine.index;
+            _currentLine.addFixation( fixation );
+        }
+
+
+        if (_currentWord && _callbacks.onMapped) {
+            _callbacks.onMapped( fixation );
+        }
 
         _logger.end( _log );
 
-        return _lastMapped ? _lastMapped.dom : null;
+        return _currentWord ? _currentWord.dom : null;
     },
 
     feed: function (targets, x, y) {
@@ -92,7 +109,7 @@ const DGWM = {
         _fixationDetector.reset();
 
         _currentLine = null;
-        _lastMapped = null;
+        _currentWord = null;
         _lastFixation = null;
         _textModel = null;
     },
@@ -107,7 +124,7 @@ const DGWM = {
     },
 
     currentWord: function () {
-        return _lastMapped;
+        return _currentWord;
     },
 
     mappedFix: function () {
@@ -119,7 +136,9 @@ const DGWM = {
 let _saccadeYThresholdInLines;
 let _saccadeYThresholdInSpacings;
 let _fixationXDistFromLineThresholdInPixels;
+let _fixationYDistFromLineThresholdInSpaces;
 let _fixationYOffsetDiffThresholdInLines;
+let _emptyLineSuperority;
 
 let _fixationDetector;
 let _logger;
@@ -127,29 +146,29 @@ let _log;
 
 let _textModel;
 let _currentLine;
-let _lastMapped;
+let _currentWord;
 let _lastFixation;
 
 const _callbacks = {
     onMapped: null
 };
 
-function getLinesWithFixatios (lines) {
-    return lines.filter( line => {
-        let prevX = -1000000;
-        const progressiveFixations = line.fixations.filter( fix => {
-            const isProgressive = fix[0] >= prevX;
-            prevX = fix[0];
-            return isProgressive;
-        });
-
-        if (!_currentLine || line === _currentLine) {
-            return progressiveFixations.length > 0;
-        }
-        else {
-            return progressiveFixations.length > 1;
-        }
+function hasValuableFixations (line) {
+    const progressiveFixations = line.fixations.filter( (fix, fi) => {
+        const isProgressive =
+            fix[3] &&           // ignore the first fixation in the session (id == 0)
+            (fix[2].x > 0 ||    // it should be progressive fixation, or
+                (fi === line.fixations.length - 1 &&    // the last fixation mapped to this line
+                    line.fixations.length > 1));        // if there are other fixations as well
+        return isProgressive;
     });
+
+    if (!_currentLine || line === _currentLine) {
+        return progressiveFixations.length > 0;
+    }
+    else {
+        return progressiveFixations.length > 1;
+    }
 }
 
 function getAverageOffsetY (lines, reference) {
@@ -163,18 +182,18 @@ function getAverageOffsetY (lines, reference) {
         line.fixations.forEach( fix => {
             let weight = 1;
             if (reference) {
-                const dy = reference.y - fix[1];
-                weight = Math.abs( 100 / (dy ? dy : 1) );
+                const dy = Math.abs( reference.y - fix[1] );
+                weight = Math.sqrt( 100 / (dy > 1 ? dy : 1) );
             }
-            lineSum += (fix[1] - y) * weight;
+            lineSum += (fix[1] - y);
             lineWeights += weight;
         });
 
         const averageLineWeight = lineWeights / line.fixations.length;
-        const averageOffsetY = lineSum / lineWeights;
+        const averageOffsetY = lineSum / line.fixations.length;
         _log.push( '    ly =', y.toFixed(0), 'd =', averageOffsetY.toFixed(0), 'w =', averageLineWeight.toFixed(3) );
 
-        sum += averageOffsetY;
+        sum += averageLineWeight * averageOffsetY;
         weights += averageLineWeight;
     });
 
@@ -182,7 +201,7 @@ function getAverageOffsetY (lines, reference) {
 }
 
 function getOffsetYFromHistory (reference) {
-    const linesWithFixations = getLinesWithFixatios( _textModel.lines );
+    const linesWithFixations = _textModel.lines.filter( hasValuableFixations );
     if (!linesWithFixations.length) {
         return 0;
     }
@@ -196,6 +215,7 @@ function lineFromSaccade (dx, dy) {
 
     let lineChange = Number.NaN;
 
+    _log.push( 'comparing dy =', dy.toFixed(0), 'against', saccadeThreshold.toFixed(0), '(next_max =', nextLineSaccadeThreshold.toFixed(0), ')' );
     if (Math.abs( dy ) < saccadeThreshold) {
         lineChange = 0;
     }
@@ -227,28 +247,77 @@ function lineFromSaccade (dx, dy) {
 }
 
 function lineFromAbsolutePosition (fixation) {
-    const verticalThreshold = _textModel.lineSpacing / 2;
+    const verticalThreshold = _textModel.lineSpacing * _fixationYDistFromLineThresholdInSpaces;
     const horizontalThreshold = _fixationXDistFromLineThresholdInPixels;
     _log.push( 'estimating line naively, vt =', verticalThreshold.toFixed(0), 'ht =', horizontalThreshold.toFixed(0) );
 
-    const offsetY = getOffsetYFromHistory( fixation );
-    _log.push( '    offset', offsetY.toFixed(0) );
+    const averageOffsetY = getOffsetYFromHistory( fixation );
+    _log.push( '    offset', averageOffsetY.toFixed(0) );
 
-    const result = _textModel.lines.find( line => {
-        let dy = Math.abs( (fixation.y - offsetY) - line.center.y );
+    const proximities = _textModel.lines.map( line => {
+        let dy = Math.abs( (fixation.y - averageOffsetY) - line.center.y );
         let dx = fixation.x < line.left ? line.left - fixation.x :
                 (fixation.x > line.right ? fixation.x - line.right : 0);
-        return dx < horizontalThreshold && dy < verticalThreshold;
+        _log.push( '    proximity to line', line.index, 'at y =', line.center.y.toFixed(0), ':', dx.toFixed(2), dy.toFixed(2) );
+        return {
+            x: dx / horizontalThreshold,
+            y: dy / verticalThreshold,
+            valid: dx < horizontalThreshold && dy < verticalThreshold,
+            line: line
+        }
     });
 
-    if (result) {
-        _log.push( 'line #', result.index );
+    const bestProximity = proximities.reduce( (best, proximity) => {
+        if (!proximity.valid) {
+            return best;
+        }
+
+        if (best) {
+            const scoreCurrent = proximity.x + proximity.y;
+            const scoreBest = best.x + best.y;
+            const scoreDelta = scoreBest - scoreCurrent;    // lower is better
+            const bestHasFixations = hasValuableFixations( best.line );
+            const currentHasFixations = hasValuableFixations( proximity.line );
+
+            let threshold;
+            //               current
+            // b        | f=yes | f=no |
+            // e        |-------+------|
+            // s f=yes  |   0   |  -T  |
+            // t f=no   |   T   |   T  |
+            if (!bestHasFixations) {
+                threshold = _emptyLineSuperority;  // favor the upper line,
+            }
+            else if (!currentHasFixations) {
+                threshold = -_emptyLineSuperority; // favor the lower line
+            }
+            else {
+                threshold = 0;  // no favor to any line, apply simple comparison
+            }
+
+            if (scoreDelta > threshold) {
+                if (best.y < _textModel.lineSpacing / 2) {
+                    _log.push( '    replaced! line', proximity.line.index, 'closer than line', best.line.index );
+                }
+                best = proximity;
+            }
+        }
+        else {
+            best = proximity;
+        }
+
+        return best;
+    }, null);
+
+    const mappedLine = bestProximity ? bestProximity.line : null;
+    if (mappedLine) {
+        _log.push( 'line #', mappedLine.index );
     }
     else {
         _log.push( 'the fixation is not on any line' );
     }
 
-    return result;
+    return mappedLine;
 }
 
 function ensureFixationIsClose (fixation) {
@@ -286,16 +355,16 @@ function ensureFixationIsClose (fixation) {
     const fixOffsetY = fixation.y - _currentLine.center.y;
     const fixationYOffsetDiffThreshold = _textModel.lineSpacing * _fixationYOffsetDiffThresholdInLines;
 
-    const linesWithFixations = getLinesWithFixatios( _textModel.lines );
+    const linesWithFixations = _textModel.lines.filter( hasValuableFixations );
     if (!linesWithFixations.length) {
         _log.push( 'cannot verify mapping' );
         return lineFromAbsolutePosition( fixation );
     }
 
-    _log.push( 'fix-line Y offset:', fixOffsetY.toFixed(0) );
-    _log.push( '    should differ by no more than', fixationYOffsetDiffThreshold.toFixed(0), 'from other offsets' );
+    _log.push( 'verification:' );
+    _log.push( '    fix-line dy =', fixOffsetY.toFixed(0), 'should differ max', fixationYOffsetDiffThreshold.toFixed(0), 'from other offsets' );
 
-    const averageOffsetY = getAverageOffsetY( linesWithFixations );
+    const averageOffsetY = getAverageOffsetY( linesWithFixations, fixation );
 
     _log.push( 'avg offset =', averageOffsetY.toFixed(0) );
 
@@ -316,7 +385,7 @@ function ensureFixationIsClose (fixation) {
 function mapToWord (fixation) {
     _log.push( 'word search' );
     const x = fixation.x;
-    let result = null;
+    let mappedWord = null;
     let minDist = Number.MAX_VALUE;
 
     const words = _currentLine.words;
@@ -328,7 +397,7 @@ function mapToWord (fixation) {
         // _log.push( '   ', dist.toFixed(0), 'to', word.element.textContent );
 
         if (dist < minDist) {
-            result = word;
+            mappedWord = word;
             minDist = dist;
             if (dist === 0) {
                 break;
@@ -336,21 +405,20 @@ function mapToWord (fixation) {
         }
     }
 
+    _log.push( '    dist =', minDist.toFixed(0) );
+
     if (minDist > _fixationXDistFromLineThresholdInPixels) {
-        result = null;
+        mappedWord = null;
     }
 
-    fixation.word = result;
-
-    if (result && _callbacks.onMapped) {
-        _callbacks.onMapped( fixation );
+    if (mappedWord) {
+        _log.push( '    mapped to', mappedWord.element.textContent, '=', mappedWord.line.index + ', ' + mappedWord.index );
+    }
+    else {
+        _log.push( '    not mapped' );
     }
 
-    _log.push( '    mapped to',
-        result ? (result.element.textContent + ' ' + result.line.index + ',' + result.index) : '---',
-        '[d=', Math.floor( minDist ), ']' );
-
-    return result;
+    return mappedWord;
 }
 
 // Publication

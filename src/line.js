@@ -62,7 +62,7 @@ Line.prototype.addWord = function (word, wordID, element) {
 
 Line.prototype.addFixation = function (fixation) {
 
-    this.fixations.push( [fixation.x, fixation.y, fixation.saccade] );
+    this.fixations.push( [fixation.x, fixation.y, fixation.saccade, fixation.id] );
     if (!_useModel || this.fixations.length < 2) {
         return;
     }
