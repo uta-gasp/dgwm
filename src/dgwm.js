@@ -212,6 +212,7 @@ function getOffsetYFromHistory (reference) {
 function lineFromSaccade (dx, dy) {
     if (!_currentLine) {
         _log.push( 'no reference line to apply line-from-saccade computation' );
+        return null;
     }
 
     const saccadeThreshold = _textModel.lineHeight * _saccadeYThresholdInLines;
