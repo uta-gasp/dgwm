@@ -210,6 +210,10 @@ function getOffsetYFromHistory (reference) {
 }
 
 function lineFromSaccade (dx, dy) {
+    if (!_currentLine) {
+        _log.push( 'no reference line to apply line-from-saccade computation' );
+    }
+
     const saccadeThreshold = _textModel.lineHeight * _saccadeYThresholdInLines;
     const nextLineSaccadeThreshold = _textModel.lineSpacing * _saccadeYThresholdInSpacings;
 
@@ -229,7 +233,7 @@ function lineFromSaccade (dx, dy) {
     _log.push( Number.isNaN( lineChange ) ? 'chaotic jump' : 'line changed by ' + lineChange);
 
     let result = null;
-    if (_currentLine && !Number.isNaN( lineChange )) {
+    if (!Number.isNaN( lineChange )) {
         const newLineIndex = _currentLine.index + lineChange;
         if (newLineIndex >= 0 && newLineIndex < _textModel.lines.length) {
             result = _textModel.lines[ newLineIndex ];
