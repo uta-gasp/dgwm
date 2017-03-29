@@ -268,7 +268,7 @@ function lineFromAbsolutePosition (fixation) {
             y: dy / verticalThreshold,
             valid: dx < horizontalThreshold && dy < verticalThreshold,
             line: line
-        }
+        };
     });
 
     const bestProximity = proximities.reduce( (best, proximity) => {
