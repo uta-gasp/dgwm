@@ -104,7 +104,7 @@ const DGWM = {
             this.reset();
             _textModel = TextModel.create( elements );
         }
-        return _textModel.model();
+        return _textModel;
     },
 
     reset: function () {
