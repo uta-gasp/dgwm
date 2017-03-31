@@ -21,6 +21,8 @@ const DGWM = {
         _fixationYDistFromLineThresholdInSpaces = options.dgwm.fixationYDistFromLineThresholdInSpaces || 0.65;
         _fixationYOffsetDiffThresholdInLines = options.dgwm.fixationYOffsetDiffThresholdInLines || 1.0;
         _emptyLineSuperority = options.dgwm.emptyLineSuperority || 0.3;
+        _effectiveLengthReductionMinWordLength = options.dgwm.effectiveLengthReductionMinWordLength || 2;
+        _effectiveLengthReductionInChars = options.dgwm.effectiveLengthReductionInChars || 3;
 
         Line.init( options.line );
 
@@ -63,14 +65,14 @@ const DGWM = {
             return null;
         }
 
-        _currentWord = mapToWord( fixation );
+        _currentWord = mapToWord( fixation, _currentLine.words );
 
         fixation.word = _currentWord;
         if (_currentWord && _currentLine) {
             fixation.line = _currentLine.index;
+            _currentWord.fixations.push( fixation );
             _currentLine.addFixation( fixation );
         }
-
 
         if (_currentWord && _callbacks.onMapped) {
             _callbacks.onMapped( fixation );
@@ -78,7 +80,7 @@ const DGWM = {
 
         _logger.end( _log );
 
-        return _currentWord ? _currentWord.dom : null;
+        return _currentWord ? _currentWord.element : null;
     },
 
     feed: function (targets, x, y) {
@@ -97,14 +99,14 @@ const DGWM = {
         return result;
     },
 
-    setWords: function (targets) {
-        if (targets) {
+    setWords: function (elements) {
+        if (elements) {
             this.reset();
-            _textModel = TextModel.create( targets );
+            _textModel = TextModel.create( elements );
         }
     },
 
-    reset: function (targets) {
+    reset: function () {
         TextModel.reset();
         _fixationDetector.reset();
 
@@ -139,6 +141,9 @@ let _fixationXDistFromLineThresholdInPixels;
 let _fixationYDistFromLineThresholdInSpaces;
 let _fixationYOffsetDiffThresholdInLines;
 let _emptyLineSuperority;
+
+let _effectiveLengthReductionMinWordLength;
+let _effectiveLengthReductionInChars;
 
 let _fixationDetector;
 let _logger;
@@ -387,19 +392,29 @@ function ensureFixationIsClose (fixation) {
     return _currentLine;
 }
 
-function mapToWord (fixation) {
+function mapToWord (fixation, words) {
     _log.push( 'word search' );
-    const x = fixation.x;
+
+    // const mappedWord = mapToWord_Naive( fixation.x, words );
+    const mappedWord = mapToWord_Advanced( fixation.x, words );
+
+    if (mappedWord) {
+        _log.push( '    mapped to', mappedWord.text, '=', mappedWord.line.index + ', ' + mappedWord.index );
+    }
+    else {
+        _log.push( '    not mapped' );
+    }
+
+    return mappedWord;
+}
+
+function mapToWord_Naive (x, words) {
     let mappedWord = null;
     let minDist = Number.MAX_VALUE;
 
-    const words = _currentLine.words;
     for (let i = 0; i < words.length; ++i) {
         const word = words[i];
-        const rect = word.rect;
-
-        const dist = x < rect.left ? (rect.left - x) : (x > rect.right ? x - rect.right : 0);
-        // _log.push( '   ', dist.toFixed(0), 'to', word.element.textContent );
+        const dist = x < word.left ? (word.left - x) : (x > word.right ? x - word.right : 0);
 
         if (dist < minDist) {
             mappedWord = word;
@@ -416,14 +431,44 @@ function mapToWord (fixation) {
         mappedWord = null;
     }
 
-    if (mappedWord) {
-        _log.push( '    mapped to', mappedWord.element.textContent, '=', mappedWord.line.index + ', ' + mappedWord.index );
-    }
-    else {
-        _log.push( '    not mapped' );
+    return mappedWord;
+}
+
+function mapToWord_Advanced (x, words) {
+    let minDist = Number.MAX_VALUE;
+    let closestWord = null;
+
+    for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        const wordWidth = word.right - word.left;
+        const textLength = word.text.length;
+        let effectiveWordWidth = wordWidth;
+        if (word.fixations.length > 0 || textLength > _effectiveLengthReductionMinWordLength) {
+            const reduceBy = Math.min( _effectiveLengthReductionInChars, textLength - _effectiveLengthReductionMinWordLength );
+            const effectiveWordWidthReduction = wordWidth * (reduceBy / textLength);
+            effectiveWordWidth = wordWidth - effectiveWordWidthReduction;
+        }
+        const wordLeft = word.left;
+        const wordRight = word.left + effectiveWordWidth;
+
+        if (x >= wordLeft && x < wordRight) {
+            closestWord = word;
+            minDist = 0;
+        }
+        else {
+            const dist = Math.max( wordLeft - x, x - wordRight );
+            if (dist < minDist) {
+                minDist = dist;
+                closestWord = word;
+            }
+        }
     }
 
-    return mappedWord;
+    if (minDist > _fixationXDistFromLineThresholdInPixels) {
+        closestWord = null;
+    }
+
+    return closestWord;
 }
 
 // Publication

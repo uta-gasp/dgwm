@@ -12,14 +12,14 @@ Line.init({
 });
 
 const words = [
-	{ left: 0, top: 0, right: 100, bottom: 40 },
-	{ left: 110, top: 0, right: 210, bottom: 40 },
-	{ left: 220, top: 0, right: 320, bottom: 40 },
-	{ left: 330, top: 0, right: 430, bottom: 40 },
-	{ left: 440, top: 0, right: 540, bottom: 40 },
-	{ left: 550, top: 0, right: 650, bottom: 40 },
-	{ left: 660, top: 0, right: 760, bottom: 40 },
-	{ left: 770, top: 0, right: 870, bottom: 40 },
+	{ rect: { left: 0, top: 0, right: 100, bottom: 40}, element: { textContent: 'aaa'} },
+	{ rect: { left: 110, top: 0, right: 210, bottom: 40 }, element: { textContent: 'aaa'} },
+	{ rect: { left: 220, top: 0, right: 320, bottom: 40 }, element: { textContent: 'aaa'} },
+	{ rect: { left: 330, top: 0, right: 430, bottom: 40 }, element: { textContent: 'aaa'} },
+	{ rect: { left: 440, top: 0, right: 540, bottom: 40 }, element: { textContent: 'aaa'} },
+	{ rect: { left: 550, top: 0, right: 650, bottom: 40 }, element: { textContent: 'aaa'} },
+	{ rect: { left: 660, top: 0, right: 760, bottom: 40 }, element: { textContent: 'aaa'} },
+	{ rect: { left: 770, top: 0, right: 870, bottom: 40 }, element: { textContent: 'aaa'} },
 ];
 
 const fixations = [
@@ -49,14 +49,11 @@ const pts = [
 
 describe( 'Line 1', function() {
 	const line = new Line();
-	words.forEach( (word) => {
-		line.addWord( word );
+	words.forEach( (word, wi) => {
+		line.addWord( word.rect, wi, word.element );
 	});
 	fixations.forEach( (fix) => {
 		line.addFixation( fix );
-	});
-	const errs = pts.map( (pt) => {
-		return line.fit( pt.x, pt.y );
 	});
 
 	describe( '#constructor()', function () {
@@ -73,27 +70,17 @@ describe( 'Line 1', function() {
 		});
     	it( `line center Y should be 20`, function () {
 			assert.equal( 20, line.center.y );
-		});
-	});
-	describe( '#addFixation( fix )', function () {
-    	it( `line fit model should be below 28`, function () {
-			assert.isTrue( errs.every( err => {
-				return Math.abs(err < 28);
-			}) );
 		});
 	});
 });
 
 describe( 'Line 2', function() {
-	const line = new Line( words[0] );
+	const line = new Line( words[0].rect, 0, words[0].element );
 	words.forEach( (word, index) => {
-		if (index) { line.addWord( word ); }
+		if (index) { line.addWord( word.rect, index, word.element ); }
 	});
 	fixations.forEach( (fix) => {
 		line.addFixation( fix );
-	});
-	const errs = pts.map( (pt) => {
-		return line.fit( pt.x, pt.y );
 	});
 
 	describe( '#constructor()', function () {
@@ -110,13 +97,6 @@ describe( 'Line 2', function() {
 		});
     	it( `line center Y should be 20`, function () {
 			assert.equal( 20, line.center.y );
-		});
-	});
-	describe( '#addFixation( fix )', function () {
-    	it( `line fit model should be below 28`, function () {
-			assert.isTrue( errs.every( err => {
-				return Math.abs(err < 28);
-			}) );
 		});
 	});
 });

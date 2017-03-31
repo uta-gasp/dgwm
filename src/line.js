@@ -144,15 +144,22 @@ function fixLinearModel (fixations, gradient) {
 
 // Word object
 function Word (rect, id, element, line) {
-    this.rect = rect;
+    this.left = rect.left;
+    this.top = rect.top;
+    this.right = rect.right;
+    this.bottom = rect.bottom;
+
     this.id = id;
+    this.index = line.words.length;
+    this.text = element.textContent;
+
     this.element = element;
     this.line = line;
-    this.index = line.words.length;
+    this.fixations = [];
 }
 
 Word.prototype.toString = function () {
-    return this.rect.left + ',' + this.rect.top + ' / ' + this.line.index;
+    return this.left + ',' + this.top + ' / ' + this.line.index;
 };
 
 // Publication

@@ -30,14 +30,6 @@ const TextModel = {
     },
 
     reset: function () {
-        // _lines.forEach(function (line) {
-        //     line.forEach(function (w) {
-        //         _logger.log('new Word({ left: ' + w.rect.left +
-        //             ', top: ' + w.rect.top +
-        //             ', right: ' + w.rect.right +
-        //             ', bottom: ' + w.rect.bottom + ' }),');
-        //     });
-        // });
         _lines = [];
         _lineSpacing = 0;
         _lineHeight = 0;

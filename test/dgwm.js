@@ -59,7 +59,9 @@ DGWM.init({
         fixationXDistFromLineThresholdInPixels: 100,
         fixationYDistFromLineThresholdInSpaces: 0.7,
         fixationYOffsetDiffThresholdInLines: 0.49,
-        emptyLineSuperority: 0.3
+        emptyLineSuperority: 0.3,
+        effectiveLengthReductionMinWordLength: 5,
+        effectiveLengthReductionInChars: 3
 	}
 });
 
