@@ -79,7 +79,6 @@ function compute (elements) {
         else {
             currentLine.addWord( rect, i, element );
         }
-//                _logger.log('{ left: ' + Math.round(rect.left) + ', top: ' + Math.round(rect.top) + ', right: ' + Math.round(rect.right) + ', bottom: ' + Math.round(rect.bottom) + ' }');
     }
 
     if (currentLine) {
@@ -97,6 +96,8 @@ function compute (elements) {
         const line = _lines[0];
         _lineSpacing = 2 * (line.bottom - line.top);
     }
+
+    _log.push('spacing:', _lineSpacing.toFixed(0), ', height:' + _lineHeight.toFixed(0) );
 }
 
 // Publication

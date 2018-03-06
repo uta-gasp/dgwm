@@ -15,6 +15,8 @@ const DGWM = {
         options = options || {};
         options.dgwm = options.dgwm || {};
 
+        Logger.enabled = options.verbose;
+
         _saccadeYThresholdInLines = options.dgwm.saccadeYThresholdInLines || 1.2;
         _saccadeYThresholdInSpacings = options.dgwm.saccadeYThresholdInSpacings || 1.75;
         _fixationXDistFromLineThresholdInPixels = options.dgwm.fixationXDistFromLineThresholdInPixels || 200;

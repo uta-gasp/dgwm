@@ -169,4 +169,5 @@ describe( 'Real data', function() {
 
 describe( 'Debugging', function() {
 	Logger.enabled = true;
+ 	runTestOnFile( 'p13_0_4.json', [7, 7, 7, 5] );
 });
